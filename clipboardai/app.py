@@ -39,6 +39,7 @@ if os.getenv('DATABASE_URL'):
     database = Database()  # PostgreSQL gets URL from environment
 else:
     database = Database('clipboardai.db')
+database.init_db()
 
 # Initialize AI processor
 ai_config = AIConfig(
@@ -408,4 +409,5 @@ if __name__ == '__main__':
         port=port,
         debug=debug
     )
+
 

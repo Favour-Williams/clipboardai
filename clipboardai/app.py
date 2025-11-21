@@ -19,7 +19,12 @@ from ai_processor import AIProcessor, AIConfig, ClipboardAIEngine
 from context_detector import ContextDetector
 from database import Database
 
-
+if os.getenv('DATABASE_URL'):
+    from database_postgres import Database
+    print("🐘 Using PostgreSQL (Production)")
+else:
+    from database import Database
+    print("🗄️  Using SQLite (Development)")
 # ==============================================================================
 # APP INITIALIZATION
 # ==============================================================================

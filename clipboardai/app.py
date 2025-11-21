@@ -35,7 +35,10 @@ CORS(app)  # Allow frontend to call API
 # Initialize components
 prompt_manager = PromptManager()
 context_detector = ContextDetector()
-database = Database('clipboardai.db')
+if os.getenv('DATABASE_URL'):
+    database = Database()  # PostgreSQL gets URL from environment
+else:
+    database = Database('clipboardai.db')
 
 # Initialize AI processor
 ai_config = AIConfig(
@@ -405,3 +408,4 @@ if __name__ == '__main__':
         port=port,
         debug=debug
     )
+

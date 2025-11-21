@@ -1,4 +1,4 @@
-const API_BASE = 'http://localhost:5000/api';
+const API_BASE = window.location.origin;
         let currentDetection = null;
 
         async function pasteFromClipboard() {
@@ -200,3 +200,4 @@ const API_BASE = 'http://localhost:5000/api';
             loadHistory();
             updateStats();
         };
+

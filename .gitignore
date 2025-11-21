@@ -8,3 +8,13 @@ __pycache__/
 .envrc
 .DS_Store
 clipboardai/clipboardai.db
+__pycache__/
+*.pyc
+*.pyo
+*.db
+*.sqlite
+*.sqlite3
+venv/
+.env
+.DS_Store
+EOL

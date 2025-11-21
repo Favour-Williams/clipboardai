@@ -20,7 +20,7 @@ const API_BASE = window.location.origin;
             }
 
             try {
-                const response = await fetch(`${API_BASE}/detect`, {
+                const response = await fetch(`${API_BASE}/api/detect`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ content })
@@ -87,7 +87,7 @@ const API_BASE = window.location.origin;
                     params.target_length = prompt('Target word count:', '50') || '50';
                 }
 
-                const response = await fetch(`${API_BASE}/process`, {
+                const response = await fetch(`${API_BASE}/api/process`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ action, content, params })
@@ -126,7 +126,7 @@ const API_BASE = window.location.origin;
 
         async function loadHistory() {
             try {
-                const response = await fetch(`${API_BASE}/history?limit=20`);
+                const response = await fetch(`${API_BASE}/api/history?limit=20`);
                 const data = await response.json();
 
                 const list = document.getElementById('historyList');
@@ -152,7 +152,7 @@ const API_BASE = window.location.origin;
 
         async function loadHistoryItem(id) {
             try {
-                const response = await fetch(`${API_BASE}/history/${id}`);
+                const response = await fetch(`${API_BASE}/api/history/${id}`);
                 const item = await response.json();
 
                 document.getElementById('inputText').value = item.input_text;
@@ -167,7 +167,7 @@ const API_BASE = window.location.origin;
 
         async function updateStats() {
             try {
-                const response = await fetch(`${API_BASE}/stats`);
+                const response = await fetch(`${API_BASE}/api/stats`);
                 const data = await response.json();
 
                 document.getElementById('totalActions').textContent = data.total_requests;
@@ -200,4 +200,5 @@ const API_BASE = window.location.origin;
             loadHistory();
             updateStats();
         };
+
 

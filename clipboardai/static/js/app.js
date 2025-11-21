@@ -1,7 +1,6 @@
 const API_BASE = 'http://localhost:5000/api';
         let currentDetection = null;
 
-        // Paste from clipboard
         async function pasteFromClipboard() {
             try {
                 const text = await navigator.clipboard.readText();
@@ -13,7 +12,6 @@ const API_BASE = 'http://localhost:5000/api';
             }
         }
 
-        // Detect content type
         async function detectContent() {
             const content = document.getElementById('inputText').value;
             if (!content.trim()) {
@@ -31,7 +29,6 @@ const API_BASE = 'http://localhost:5000/api';
                 const result = await response.json();
                 currentDetection = result;
 
-                // Show detection info
                 document.getElementById('detectionInfo').classList.add('active');
                 document.getElementById('contentType').textContent = result.type;
                 document.getElementById('confidenceText').textContent = 
@@ -41,7 +38,6 @@ const API_BASE = 'http://localhost:5000/api';
                 document.getElementById('suggestedActionsText').textContent = 
                     `Suggested actions: ${result.suggested_actions.slice(0, 3).join(', ')}`;
 
-                // Show action buttons
                 renderActionButtons(result.suggested_actions);
 
             } catch (err) {
@@ -50,7 +46,6 @@ const API_BASE = 'http://localhost:5000/api';
             }
         }
 
-        // Render action buttons
         function renderActionButtons(actions) {
             const grid = document.getElementById('actionsGrid');
             grid.innerHTML = '';
@@ -64,14 +59,12 @@ const API_BASE = 'http://localhost:5000/api';
             });
         }
 
-        // Format action name for display
         function formatActionName(action) {
             return action.split('_').map(word => 
                 word.charAt(0).toUpperCase() + word.slice(1)
             ).join(' ');
         }
 
-        // Execute AI action
         async function executeAction(action) {
             const content = document.getElementById('inputText').value;
             if (!content.trim()) {
@@ -79,7 +72,6 @@ const API_BASE = 'http://localhost:5000/api';
                 return;
             }
 
-            // Show loading
             document.getElementById('loading').classList.add('active');
             document.getElementById('outputText').value = '';
             document.getElementById('copyBtn').style.display = 'none';
@@ -88,7 +80,6 @@ const API_BASE = 'http://localhost:5000/api';
             try {
                 const params = {};
                 
-                // Handle actions that need extra parameters
                 if (action === 'translate') {
                     params.target_language = prompt('Enter target language:', 'Spanish') || 'Spanish';
                 }
@@ -123,7 +114,6 @@ const API_BASE = 'http://localhost:5000/api';
             }
         }
 
-        // Copy output to clipboard
         async function copyOutput() {
             const text = document.getElementById('outputText').value;
             try {
@@ -134,7 +124,6 @@ const API_BASE = 'http://localhost:5000/api';
             }
         }
 
-        // Load history
         async function loadHistory() {
             try {
                 const response = await fetch(`${API_BASE}/history?limit=20`);
@@ -142,7 +131,7 @@ const API_BASE = 'http://localhost:5000/api';
 
                 const list = document.getElementById('historyList');
                 if (data.history.length === 0) {
-                    list.innerHTML = '<p style="text-align: center; color: #999;">No history yet. Start using ClipboardAI!</p>';
+                    list.innerHTML = '<p style="text-align: center; color: #64748b;">No history yet. Start using ClipboardAI!</p>';
                     return;
                 }
 
@@ -161,7 +150,6 @@ const API_BASE = 'http://localhost:5000/api';
             }
         }
 
-        // Load specific history item
         async function loadHistoryItem(id) {
             try {
                 const response = await fetch(`${API_BASE}/history/${id}`);
@@ -177,7 +165,6 @@ const API_BASE = 'http://localhost:5000/api';
             }
         }
 
-        // Update stats
         async function updateStats() {
             try {
                 const response = await fetch(`${API_BASE}/stats`);
@@ -190,7 +177,6 @@ const API_BASE = 'http://localhost:5000/api';
             }
         }
 
-        // Show success message
         function showSuccess(message) {
             const el = document.getElementById('successMessage');
             el.textContent = message;
@@ -198,7 +184,6 @@ const API_BASE = 'http://localhost:5000/api';
             setTimeout(() => el.classList.remove('active'), 3000);
         }
 
-        // Show error message
         function showError(message) {
             const el = document.getElementById('errorMessage');
             el.textContent = message;
@@ -206,13 +191,11 @@ const API_BASE = 'http://localhost:5000/api';
             setTimeout(() => el.classList.remove('active'), 3000);
         }
 
-        // Hide messages
         function hideMessages() {
             document.getElementById('successMessage').classList.remove('active');
             document.getElementById('errorMessage').classList.remove('active');
         }
 
-        // Initialize on page load
         window.onload = () => {
             loadHistory();
             updateStats();

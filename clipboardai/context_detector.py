@@ -349,31 +349,3 @@ if __name__ == "__main__":
         print("\n\n👋 Goodbye!")
 
 
-# ==============================================================================
-# YOUR MISSION
-# ==============================================================================
-"""
-🎯 UNDERSTAND THIS FILE, THEN:
-
-1. Run it: python context_detector.py
-2. Test it with different clipboard content
-3. Notice how it detects types and suggests actions
-
-NEXT STEPS:
-Once you understand how this works, we'll integrate it with the 
-clipboard monitor so ClipboardAI can automatically offer relevant 
-actions based on what you copy!
-
-KEY CONCEPTS TO GRASP:
-- Pattern matching with regex
-- Confidence scoring (not just yes/no, but "how sure are we?")
-- Action mapping (different content types → different AI actions)
-- The Enum pattern for type safety
-
-CHALLENGE QUESTION:
-Look at the _detect_programming_language() method. Why do we use 
-SCORES instead of just checking if ONE pattern matches?
-
-Hint: What if someone copies "import json" - is that Python code 
-or just a random line? How confident should we be?
-"""

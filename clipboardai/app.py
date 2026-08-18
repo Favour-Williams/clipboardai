@@ -39,7 +39,13 @@ if os.getenv('DATABASE_URL'):
     database = Database()  # PostgreSQL gets URL from environment
 else:
     database = Database('clipboardai.db')
-database.init_db()
+
+# Init DB at startup, but never let a DB failure crash the app (e.g. read-only
+# filesystem on serverless hosts like Vercel)
+try:
+    database.init_db()
+except Exception as e:
+    print(f"⚠️  Database init skipped: {e}")
 
 # Initialize AI processor
 ai_config = AIConfig(
@@ -152,16 +158,20 @@ def process_action():
     # Execute action
     result = engine.execute_action(action, content, **params)
     
-    # Save to history if successful
+    # Save to history if successful (DB failures must not break the API response)
     history_id = None
     if result['success']:
-        history_id = database.add_history(
-            action=action,
-            input_text=content,
-            output_text=result['content'],
-            tokens_used=result['tokens_used'],
-            model=result['model']
-        )
+        try:
+            history_id = database.add_history(
+                action=action,
+                input_text=content,
+                output_text=result['content'],
+                tokens_used=result['tokens_used'],
+                model=result['model']
+            )
+        except Exception as e:
+            print(f"⚠️  History save failed: {e}")
+            history_id = None
     
     # Build response
     response = {
@@ -247,7 +257,11 @@ def get_history():
     limit = request.args.get('limit', 50, type=int)
     action = request.args.get('action')
     
-    history = database.get_history(limit=limit, action_filter=action)
+    try:
+        history = database.get_history(limit=limit, action_filter=action)
+    except Exception as e:
+        print(f"⚠️  History load failed: {e}")
+        history = []
     
     return jsonify({"history": history})
 
@@ -268,7 +282,11 @@ def get_history_item(history_id):
         "timestamp": "2025-01-15T10:30:00"
     }
     """
-    item = database.get_history_item(history_id)
+    try:
+        item = database.get_history_item(history_id)
+    except Exception as e:
+        print(f"⚠️  History item load failed: {e}")
+        item = None
     
     if not item:
         return jsonify({'error': 'History item not found'}), 404
@@ -279,7 +297,11 @@ def get_history_item(history_id):
 @app.route('/api/history/<int:history_id>', methods=['DELETE'])
 def delete_history_item(history_id):
     """Delete a history item."""
-    success = database.delete_history_item(history_id)
+    try:
+        success = database.delete_history_item(history_id)
+    except Exception as e:
+        print(f"⚠️  History delete failed: {e}")
+        success = False
     
     if not success:
         return jsonify({'error': 'History item not found'}), 404
@@ -311,15 +333,22 @@ def get_stats():
     # Get AI stats
     ai_stats = engine.get_stats()
     
-    # Get database stats
-    db_stats = database.get_stats()
+    # Get database stats (gracefully degrade if DB is unavailable)
+    try:
+        db_stats = database.get_stats()
+        actions_by_type = db_stats['actions_by_type']
+        history_count = db_stats['total_count']
+    except Exception as e:
+        print(f"⚠️  Stats load failed: {e}")
+        actions_by_type = {}
+        history_count = 0
     
     return jsonify({
         'total_requests': ai_stats['ai_stats']['total_requests'],
         'total_tokens': ai_stats['ai_stats']['total_tokens'],
         'estimated_cost': ai_stats['estimated_cost'],
-        'actions_by_type': db_stats['actions_by_type'],
-        'history_count': db_stats['total_count']
+        'actions_by_type': actions_by_type,
+        'history_count': history_count
     })
 
 
@@ -409,5 +438,3 @@ if __name__ == '__main__':
         port=port,
         debug=debug
     )
-
-
